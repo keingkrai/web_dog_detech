@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #01579b;
+  --color-primary-light: #0277bd;
+  --color-primary-dark: #003c6e;
+  --color-success: #00897b;
+  --color-risk: #c62828;
+  --color-bg: #f0f4f8;
+  --color-surface: #ffffff;
+  --color-text: #1a202c;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #f0f4f8;
+  color: #1a202c;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #e2e8f0; }
+::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+/* Drag-drop active */
+.drop-active {
+  border-color: #01579b !important;
+  background-color: #e3f2fd !important;
+}
+
+/* Risk gauge animation */
+@keyframes pulse-risk {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(198, 40, 40, 0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(198, 40, 40, 0); }
+}
+.animate-risk { animation: pulse-risk 1.8s ease-in-out infinite; }
+
+@keyframes pulse-normal {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 137, 123, 0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(0, 137, 123, 0); }
+}
+.animate-normal { animation: pulse-normal 2s ease-in-out infinite; }
+
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+.animate-spin-slow { animation: spin-slow 2s linear infinite; }
+
+/* Card hover */
+.card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.card-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(1, 87, 155, 0.12); }
