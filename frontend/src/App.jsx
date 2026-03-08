@@ -4,6 +4,7 @@ import AudioInput from './components/AudioInput'
 import ResultsDashboard from './components/ResultsDashboard'
 import HistoryLog from './components/HistoryLog'
 import SettingsView from './components/SettingsView'
+import RiskAreas from './components/RiskAreas'
 import { Activity, CheckCircle2, Stethoscope, Menu, X } from 'lucide-react'
 
 function DashboardView({ result, setResult }) {
@@ -23,8 +24,8 @@ function DashboardView({ result, setResult }) {
         )}
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
-        {/* Left Column: Input Panel + Info Strip */}
+      <div className="flex flex-col gap-4 items-stretch w-full">
+        {/* Top: Input Panel */}
         <div className="space-y-4">
           <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4 flex flex-col">
             <div className="flex items-center gap-2 mb-3">
@@ -37,8 +38,8 @@ function DashboardView({ result, setResult }) {
           </div>
         </div>
 
-        {/* Results Panel */}
-        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
+        {/* Bottom: Results Panel */}
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4 w-full">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center">
               <Activity size={16} className="text-teal-600" />
@@ -111,6 +112,7 @@ export default function App() {
         </div>
 
         {activeView === 'dashboard' && <DashboardView result={result} setResult={setResult} />}
+        {activeView === 'risk_areas' && <RiskAreas />}
         {activeView === 'history' && <HistoryLog />}
         {activeView === 'settings' && <SettingsView />}
       </main>

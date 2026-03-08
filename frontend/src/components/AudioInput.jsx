@@ -37,10 +37,31 @@ export default function AudioInput({ onResult }) {
   const submitForAnalysis = async (file) => {
     setIsAnalyzing(true)
     setError(null)
+    
+    // Try to get location
+    let lat = null
+    let lng = null
+    try {
+      if ('geolocation' in navigator) {
+        const position = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 })
+        })
+        lat = position.coords.latitude
+        lng = position.coords.longitude
+      }
+    } catch (e) {
+      console.warn("Could not get location:", e)
+    }
+
     const formData = new FormData()
     formData.append('file', file)
+    if (lat && lng) {
+      formData.append('latitude', lat)
+      formData.append('longitude', lng)
+    }
+
     try {
-      const { data } = await axios.post('/api/analyze/full', formData, {
+      const { data } = await axios.post('http://localhost:8000/analyze/full', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         timeout: 30000,
       })

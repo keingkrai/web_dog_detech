@@ -36,6 +36,8 @@ class HistoryEntryORM(Base):
     confidence = Column(Float, nullable=False)
     peak_frequency = Column(Float, nullable=False)
     risk_level = Column(String(50), nullable=False)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
 
 
 # ── Init ─────────────────────────────────────────────────────────
@@ -46,13 +48,15 @@ async def init_db():
 
 
 # ── CRUD ─────────────────────────────────────────────────────────
-async def add_entry(prediction: str, confidence: float, peak_frequency: float, risk_level: str) -> dict:
+async def add_entry(prediction: str, confidence: float, peak_frequency: float, risk_level: str, latitude: float = None, longitude: float = None) -> dict:
     async with AsyncSessionLocal() as session:
         entry = HistoryEntryORM(
             prediction=prediction,
             confidence=round(confidence, 4),
             peak_frequency=round(peak_frequency, 1),
             risk_level=risk_level,
+            latitude=latitude,
+            longitude=longitude,
         )
         session.add(entry)
         await session.commit()
@@ -84,4 +88,6 @@ def _to_dict(entry: HistoryEntryORM) -> dict:
         "confidence": entry.confidence,
         "peak_frequency": entry.peak_frequency,
         "risk_level": entry.risk_level,
+        "latitude": entry.latitude,
+        "longitude": entry.longitude,
     }

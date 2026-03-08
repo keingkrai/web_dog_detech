@@ -13,6 +13,8 @@ class AnalysisResult(BaseModel):
     frequency_data: list[dict]  # [{freq: float, magnitude: float}]
     processing_time_ms: float
     timestamp: str
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
 
 class HistoryEntry(BaseModel):
@@ -22,6 +24,8 @@ class HistoryEntry(BaseModel):
     confidence: float
     peak_frequency: float
     risk_level: str
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
 
 class HistoryResponse(BaseModel):

@@ -5,7 +5,7 @@ FastAPI Backend — main entry point
 
 from contextlib import asynccontextmanager
 from datetime import datetime
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 
 import audio_processor
@@ -47,7 +47,11 @@ async def health():
 
 
 @app.post("/analyze", response_model=AnalysisResult)
-async def analyze_audio(file: UploadFile = File(...)):
+async def analyze_audio(
+    file: UploadFile = File(...),
+    latitude: float = Form(None),
+    longitude: float = Form(None)
+):
     """Basic analyze endpoint — no chart data in response."""
     audio_bytes = await file.read()
     if len(audio_bytes) == 0:
@@ -62,6 +66,8 @@ async def analyze_audio(file: UploadFile = File(...)):
         confidence=result["confidence"],
         peak_frequency=result["peak_frequency"],
         risk_level=result["risk_level"],
+        latitude=latitude,
+        longitude=longitude,
     )
 
     return AnalysisResult(
@@ -78,7 +84,11 @@ async def analyze_audio(file: UploadFile = File(...)):
 
 
 @app.post("/analyze/full")
-async def analyze_audio_full(file: UploadFile = File(...)):
+async def analyze_audio_full(
+    file: UploadFile = File(...),
+    latitude: float = Form(None),
+    longitude: float = Form(None)
+):
     """Full analyze endpoint — includes waveform + frequency data for charts."""
     audio_bytes = await file.read()
     if len(audio_bytes) == 0:
@@ -93,6 +103,8 @@ async def analyze_audio_full(file: UploadFile = File(...)):
         confidence=result["confidence"],
         peak_frequency=result["peak_frequency"],
         risk_level=result["risk_level"],
+        latitude=latitude,
+        longitude=longitude,
     )
 
     return {
