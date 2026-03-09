@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Sidebar from './components/Sidebar'
 import AudioInput from './components/AudioInput'
 import ResultsDashboard from './components/ResultsDashboard'
 import HistoryLog from './components/HistoryLog'
 import SettingsView from './components/SettingsView'
 import RiskAreas from './components/RiskAreas'
-import { Activity, CheckCircle2, Stethoscope, Menu, X } from 'lucide-react'
+import Login from './components/Login'
+import Register from './components/Register'
+import { Activity, CheckCircle2, Stethoscope, Menu, X, User, LogOut } from 'lucide-react'
 
 function DashboardView({ result, setResult }) {
   return (
@@ -67,6 +69,29 @@ export default function App() {
   const [activeView, setActiveView] = useState('dashboard')
   const [result, setResult] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('ascrd_user')
+    return saved ? JSON.parse(saved) : null
+  })
+  const [authView, setAuthView] = useState('login')
+
+  const handleLogin = (token, username) => {
+    const userData = { token, username }
+    localStorage.setItem('ascrd_user', JSON.stringify(userData))
+    setUser(userData)
+    setActiveView('dashboard')
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('ascrd_user')
+    setUser(null)
+    setAuthView('login')
+  }
+
+  if (!user) {
+    if (authView === 'login') return <Login onLogin={handleLogin} switchToRegister={() => setAuthView('register')} />
+    return <Register onRegisterSuccess={(username) => setAuthView('login')} switchToLogin={() => setAuthView('login')} />
+  }
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row relative" style={{ background: '#f0f4f8' }}>
@@ -77,9 +102,15 @@ export default function App() {
           <Activity size={20} className="text-blue-300" />
           <span className="font-bold tracking-wide">ASCRD</span>
         </div>
-        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-1">
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5 text-blue-100 text-sm bg-blue-800/50 px-2 py-1 rounded-lg">
+            <User size={14} />
+            <span className="truncate max-w-[80px]">{user.username}</span>
+          </div>
+          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-1 hover:bg-blue-800 rounded-lg transition-colors">
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {/* Sidebar Overlay for Mobile */}
@@ -105,9 +136,22 @@ export default function App() {
           <div className="text-xs font-medium text-slate-400 uppercase tracking-widest">
             ASCRD — Acoustic Screening for Canine Rabies Detection
           </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-100 shadow-sm">
-            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-xs text-slate-500 font-medium">System Ready</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-100 shadow-sm">
+              <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+              <span className="text-xs text-slate-500 font-medium">System Ready</span>
+            </div>
+            <div className="flex items-center gap-3 px-3 py-1.5 rounded-full bg-white border border-slate-100 shadow-sm">
+              <div className="flex items-center gap-1.5 text-slate-600 text-sm font-medium">
+                <User size={14} className="text-blue-600" />
+                <span>{user.username}</span>
+              </div>
+              <div className="w-px h-4 bg-slate-200"></div>
+              <button onClick={handleLogout} className="text-slate-400 hover:text-red-600 transition-colors flex items-center gap-1 text-sm">
+                <LogOut size={14} />
+                <span>Logout</span>
+              </button>
+            </div>
           </div>
         </div>
 
