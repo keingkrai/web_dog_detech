@@ -12,7 +12,7 @@ import {
 
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'risk_areas', label: 'พื้นที่เสี่ยง (Risk Map)', icon: MapPin },
+  { id: 'risk_areas', label: 'Risk Map', icon: MapPin },
   { id: 'history', label: 'History Log', icon: History },
   { id: 'settings', label: 'Settings', icon: Settings },
 ]

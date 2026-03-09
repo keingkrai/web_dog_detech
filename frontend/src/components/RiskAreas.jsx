@@ -11,7 +11,7 @@ export default function RiskAreas() {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const { data } = await axios.get('http://localhost:8000/history')
+        const { data } = await axios.get('https://web-dog-detech.onrender.com/history')
         // Filter only risk cases that have latitude and longitude
         const risks = data.entries.filter(e => e.risk_level === 'risk' && e.latitude && e.longitude)
         setRiskEntries(risks)

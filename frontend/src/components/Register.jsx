@@ -18,7 +18,7 @@ export default function Register({ onRegisterSuccess, switchToLogin }) {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/register', {
+      const response = await fetch('https://web-dog-detech.onrender.com/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),

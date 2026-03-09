@@ -17,7 +17,7 @@ export default function Login({ onLogin, switchToRegister }) {
       formData.append('username', username);
       formData.append('password', password);
 
-      const response = await fetch('http://localhost:8000/login', {
+      const response = await fetch('https://web-dog-detech.onrender.com/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: formData,

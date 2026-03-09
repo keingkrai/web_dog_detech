@@ -30,7 +30,7 @@ export default function SettingsView() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await fetch('http://localhost:8000/me', {
+        const res = await fetch('https://web-dog-detech.onrender.com/me', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {
@@ -55,7 +55,7 @@ export default function SettingsView() {
     setIsSaving(true);
     setMessage('');
     try {
-      const res = await fetch('http://localhost:8000/me', {
+      const res = await fetch('https://web-dog-detech.onrender.com/me', {
         method: 'PUT',
         headers: { 
           'Authorization': `Bearer ${token}`,

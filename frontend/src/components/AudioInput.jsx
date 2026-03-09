@@ -61,7 +61,7 @@ export default function AudioInput({ onResult }) {
     }
 
     try {
-      const { data } = await axios.post('http://localhost:8000/analyze/full', formData, {
+      const { data } = await axios.post('https://web-dog-detech.onrender.com/analyze/full', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         timeout: 30000,
       })
@@ -140,7 +140,7 @@ export default function AudioInput({ onResult }) {
         <div className="flex-1 h-px bg-slate-200" />
       </div>
 
-      <div className="flex justify-center flex-1">
+      {/* <div className="flex justify-center flex-1">
         {!isRecording ? (
           <button
             onClick={startRecording}
@@ -160,7 +160,7 @@ export default function AudioInput({ onResult }) {
             Stop — {fmt(recordingSeconds)}
           </button>
         )}
-      </div>
+      </div> */}
 
       {/* Selected File Card */}
       {selectedFile && !isAnalyzing && (

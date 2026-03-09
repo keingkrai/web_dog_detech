@@ -13,7 +13,8 @@ export default function HistoryLog() {
     setLoading(true)
     setError(null)
     try {
-      const { data } = await axios.get('/api/history')
+      const { data } = await axios.get('https://web-dog-detech.onrender.com/history')
+      console.log(data)
       setEntries(data.entries)
     } catch {
       setError('Could not load history. Make sure the backend is running.')
