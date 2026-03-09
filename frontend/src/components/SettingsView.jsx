@@ -1,5 +1,5 @@
-import React from 'react'
-import { Settings as SettingsIcon, ShieldOff, Server, Cpu, Info } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Settings as SettingsIcon, ShieldOff, Server, Cpu, Info, User, Mail, Building2, Save, Loader2 } from 'lucide-react'
 
 function Section({ title, children }) {
   return (
@@ -20,6 +20,62 @@ function InfoRow({ label, value }) {
 }
 
 export default function SettingsView() {
+  const [profile, setProfile] = useState({ full_name: '', email: '', organization: '' });
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const token = JSON.parse(localStorage.getItem('ascrd_user'))?.token;
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch('http://localhost:8000/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setProfile({
+            full_name: data.full_name || '',
+            email: data.email || '',
+            organization: data.organization || ''
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch profile", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    if (token) fetchProfile(); else setIsLoading(false);
+  }, [token]);
+
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    setMessage('');
+    try {
+      const res = await fetch('http://localhost:8000/me', {
+        method: 'PUT',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(profile)
+      });
+      if (res.ok) {
+        setMessage('Profile updated successfully!');
+        setTimeout(() => setMessage(''), 3000);
+      } else {
+        setMessage('Failed to update profile.');
+      }
+    } catch (err) {
+      setMessage('Error updating profile.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-5">
       {/* Header */}
@@ -28,10 +84,82 @@ export default function SettingsView() {
           <SettingsIcon size={20} className="text-blue-600" />
         </div>
         <div>
-          <h2 className="font-bold text-slate-800 text-lg">Settings</h2>
-          <p className="text-slate-400 text-sm">System configuration & privacy</p>
+          <h2 className="font-bold text-slate-800 text-lg">Settings & Profile</h2>
+          <p className="text-slate-400 text-sm">Manage your account and system configuration</p>
         </div>
       </div>
+
+      <Section title="User Profile">
+        {isLoading ? (
+          <div className="py-8 flex justify-center text-slate-400">
+            <Loader2 className="w-6 h-6 animate-spin" />
+          </div>
+        ) : (
+          <form onSubmit={handleSaveProfile} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User size={16} className="text-slate-400" />
+                  </div>
+                  <input
+                    type="text"
+                    className="block w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-slate-50"
+                    placeholder="Dr. John Doe"
+                    value={profile.full_name}
+                    onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail size={16} className="text-slate-400" />
+                  </div>
+                  <input
+                    type="email"
+                    className="block w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-slate-50"
+                    placeholder="john@example.com"
+                    value={profile.email}
+                    onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-slate-700 mb-1">Organization / Clinic</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Building2 size={16} className="text-slate-400" />
+                  </div>
+                  <input
+                    type="text"
+                    className="block w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-slate-50"
+                    placeholder="Central Veterinary Hospital"
+                    value={profile.organization}
+                    onChange={(e) => setProfile({ ...profile, organization: e.target.value })}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+              <span className={`text-sm ${message.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
+                {message}
+              </span>
+              <button
+                type="submit"
+                disabled={isSaving}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+              >
+                {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                Save Changes
+              </button>
+            </div>
+          </form>
+        )}
+      </Section>
 
       <Section title="Privacy Controls">
         <div className="flex items-start gap-4 p-4 rounded-xl bg-blue-50 border border-blue-100">

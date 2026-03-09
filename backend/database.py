@@ -40,6 +40,18 @@ class HistoryEntryORM(Base):
     longitude = Column(Float, nullable=True)
 
 
+class UserORM(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String(50), unique=True, index=True, nullable=False)
+    password_hash = Column(String(255), nullable=False)
+    full_name = Column(String(100), nullable=True)
+    email = Column(String(150), nullable=True)
+    organization = Column(String(100), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
 # ── Init ─────────────────────────────────────────────────────────
 async def init_db():
     """Create tables if they don't already exist."""
@@ -77,6 +89,71 @@ async def clear_history():
     async with AsyncSessionLocal() as session:
         await session.execute(text("DELETE FROM screening_history"))
         await session.commit()
+
+
+# ── User CRUD ────────────────────────────────────────────────────
+async def create_user(username: str, password_hash: str) -> dict:
+    async with AsyncSessionLocal() as session:
+        user = UserORM(
+            username=username, 
+            password_hash=password_hash,
+            full_name="",
+            email="",
+            organization=""
+        )
+        session.add(user)
+        try:
+            await session.commit()
+            await session.refresh(user)
+            return {
+                "id": user.id, 
+                "username": user.username, 
+                "full_name": user.full_name,
+                "email": user.email,
+                "organization": user.organization,
+                "created_at": user.created_at.isoformat()
+            }
+        except Exception:
+            await session.rollback()
+            return None
+
+
+async def get_user_by_username(username: str):
+    from sqlalchemy import select
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(UserORM).where(UserORM.username == username)
+        )
+        return result.scalars().first()
+
+
+async def update_user_profile(username: str, profile_data: dict):
+    from sqlalchemy import select, update
+    async with AsyncSessionLocal() as session:
+        user_result = await session.execute(
+            select(UserORM).where(UserORM.username == username)
+        )
+        user = user_result.scalars().first()
+        if not user:
+            return None
+        
+        if "full_name" in profile_data:
+            user.full_name = profile_data["full_name"]
+        if "email" in profile_data:
+            user.email = profile_data["email"]
+        if "organization" in profile_data:
+            user.organization = profile_data["organization"]
+            
+        await session.commit()
+        await session.refresh(user)
+        return {
+            "id": user.id, 
+            "username": user.username, 
+            "full_name": user.full_name,
+            "email": user.email,
+            "organization": user.organization,
+            "created_at": user.created_at.isoformat()
+        }
 
 
 # ── Helper ───────────────────────────────────────────────────────
